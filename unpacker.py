@@ -2,6 +2,7 @@ import gf
 import os
 import binascii
 import re
+from datetime import datetime
 from ctypes import cdll, c_char_p, create_string_buffer
 
 
@@ -86,7 +87,7 @@ def unpack():
             entry.path_length = gf.get_int16(fbin, offset+0x1C)
             if entry.path_length == 0:
                 continue  # Sometimes ends with a 0 length path for some reason
-            entry.path = fbin[offset+0x2E:offset+(0x2E+entry.path_length)].decode('ansi')
+            entry.path = fbin[offset+0x2E:offset+(0x2E+entry.path_length)].decode('ISO-8859-1')
             if entry.bitflags != 0x8 and entry.bitflags != 0x14 and entry.bitflags != 0x9:
                 print(f'Skipping file {entry.path} as probably wrong, like in middle of chunk. Skipped {skipped}')
                 skipped.append(entry.path)
@@ -101,7 +102,7 @@ def unpack():
             entry = EntryA()
             entry.pk = fbin[ot:ot+4]
             entry.path_length = gf.get_int32(fbin, ot+0x1A)
-            entry.path = fbin[ot+0x1E:ot+(0x1E+entry.path_length)].decode('ansi')
+            entry.path = fbin[ot+0x1E:ot+(0x1E+entry.path_length)].decode('ISO-8859-1')
             if entryb.path != entry.path:
                 raise Exception('ERROR PATHS DIFFER')
             else:
@@ -131,8 +132,8 @@ def unpack():
 
 
 if __name__ == '__main__':
-    direc = 'G:/SteamLibrary/steamapps/common/New World Playtest/assets/'
-    out_direc = 'Z:/RE_OtherGames/NewWorld/unpack2/'
+    direc = '/mnt/bigssd/steam/steamapps/common/New World/assets/'
+    out_direc = '/mnt/bigssd/nwpak/' + datetime.now().strftime("%Y-%m-%d")
     os.makedirs(out_direc, exist_ok=True)
     unpack()
     print(f'Total skipped: {[x[:36] for x in skipped]}')
